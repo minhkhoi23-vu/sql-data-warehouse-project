@@ -1,5 +1,6 @@
 --Checking data quality for crm_cust_info
-
+	
+	--cst_id
 			-- Checking for Null or Duplicates in Primary Key
 			-- Expectation: No Result
 			SELECT 
@@ -18,6 +19,7 @@
 	HAVING COUNT(*) > 1 OR cst_id IS NULL;
 
 
+	--cst_marital_status
 			-- Checking for unwanted Spaces
 			-- Expectation: No Result
 			SELECT 
@@ -32,6 +34,7 @@
 	WHERE cst_marital_status != trim(cst_marital_status);
 
 
+	--cst_gndr
 			--Data Standardization & Consistency
 			SELECT DISTINCT cst_gndr
 			FROM bronze.crm_cust_info;
@@ -59,6 +62,7 @@ FROM silver.crm_cust_info;
 
 --Checking data quality for crm_prd_info
 
+	--prd_id
 			-- Checking for Null or Duplicates in Primary Key
 			-- Expectation: No Result
 			SELECT 
@@ -77,6 +81,7 @@ FROM silver.crm_cust_info;
 	HAVING COUNT(*) > 1 OR prd_id IS NULL;
 
 
+	--prd_mn
 			-- Checking for unwanted Spaces
 			-- Expectation: No Result
 			SELECT 
@@ -91,6 +96,7 @@ FROM silver.crm_cust_info;
 	WHERE prd_nm != trim(prd_nm);
 
 
+	--prd_cost
 			--Checking for Nulls or Negative number
 			-- Expectation: No Result
 			SELECT 
@@ -105,6 +111,7 @@ FROM silver.crm_cust_info;
 	WHERE prd_cost < 0 OR prd_cost IS NULL;
 
 
+	--prd_line
 			--Data Standardization & Consistency
 			SELECT DISTINCT prd_line
 			FROM bronze.crm_prd_info;
@@ -113,7 +120,8 @@ FROM silver.crm_cust_info;
 	SELECT DISTINCT prd_line
 	FROM silver.crm_prd_info;
 
-
+	
+	--prd_start_dt and prd_end_dt
 			--Checking data quality in datetime
 			SELECT *
 			FROM bronze.crm_prd_info
@@ -136,6 +144,7 @@ FROM silver.crm_prd_info;
 
 
 --Checking data quality for crm_prd_info
+
 		--sls_ord_num
 				--Checking unwanted spaces 
 				--Expectation: No Results
@@ -144,10 +153,11 @@ FROM silver.crm_prd_info;
 				WHERE sls_ord_num != trim(sls_ord_num);
 				--Result: 0 sls_ord_num need to be trimmed
 				
-				--Testing Data:
-				SELECT *
-				FROM silver.crm_sales_details
-				WHERE sls_ord_num != trim(sls_ord_num);
+		--Testing Data:
+		SELECT *
+		FROM silver.crm_sales_details
+		WHERE sls_ord_num != trim(sls_ord_num);
+
 
 		--sls_prd_key
 				--Checking unwanted spaces 
@@ -157,10 +167,11 @@ FROM silver.crm_prd_info;
 				WHERE sls_prd_key != trim(sls_prd_key);
 				--Result: 0 sls_ord_num need to be trimmed
 
-				--
-				SELECT *
-				FROM silver.crm_sales_details
-				WHERE sls_prd_key != trim(sls_prd_key);
+		-- Testing
+		SELECT *
+		FROM silver.crm_sales_details
+		WHERE sls_prd_key != trim(sls_prd_key);
+
 
 		--sls_prd_key
 				--Checking whether any sls_prd_key dont exist in pro_info.prd_key
@@ -170,10 +181,10 @@ FROM silver.crm_prd_info;
 				WHERE sls_prd_key NOT IN (SELECT silver.crm_prd_info.prd_key from silver.crm_prd_info);
 				--Result: no extra prd_key or mistake on prd_key detected
 
-				--
-				SELECT *
-				FROM silver.crm_sales_details
-				WHERE sls_prd_key NOT IN (SELECT silver.crm_prd_info.prd_key from silver.crm_prd_info);
+		-- Testing
+		SELECT *
+		FROM silver.crm_sales_details
+		WHERE sls_prd_key NOT IN (SELECT silver.crm_prd_info.prd_key from silver.crm_prd_info);
 
 
 		--sls_cust_id
@@ -184,10 +195,11 @@ FROM silver.crm_prd_info;
 				WHERE sls_cust_id NOT IN (SELECT silver.crm_cust_info.cst_id from silver.crm_cust_info);
 				--Result: no extra sls_cust_id or mistake on sls_cust_id detected
 
-			    --
-				SELECT *
-				FROM silver.crm_sales_details
-				WHERE sls_cust_id NOT IN (SELECT silver.crm_cust_info.cst_id from silver.crm_cust_info);
+		-- Testing
+		SELECT *
+		FROM silver.crm_sales_details
+		WHERE sls_cust_id NOT IN (SELECT silver.crm_cust_info.cst_id from silver.crm_cust_info);
+
 
 		--sls_order_dt
 				--Chceking the 0 and negative values in sls_order_dt (1)(2)
@@ -254,11 +266,12 @@ FROM silver.crm_prd_info;
 				OR sls_ship_dt > sls_due_dt;
 				--no problems that the order date is later the ship date (ship and due too)
 
-				--
-				SELECT *
-				FROM silver.crm_sales_details
-				WHERE sls_order_dt > sls_ship_dt
-				OR sls_ship_dt > sls_due_dt;
+		-- Testing
+		SELECT *
+		FROM silver.crm_sales_details
+		WHERE sls_order_dt > sls_ship_dt
+		OR sls_ship_dt > sls_due_dt;
+
 
 		--sls_sales, sls_quantity, and sls_price
 				--
@@ -285,16 +298,18 @@ FROM silver.crm_prd_info;
 				-- no problem in quantity
 				--7 NULL and 5 Negative values in price
 
-				--
-				SELECT DISTINCT
-					sls_sales,
-					sls_quantity,
-					sls_price
-				FROM silver.crm_sales_details
-				WHERE sls_sales != sls_quantity * sls_price
-				OR sls_sales IS NULL OR sls_quantity IS NULL OR sls_price IS NULL
-				OR sls_sales <= 0 OR sls_quantity <= 0 OR sls_price <= 0
-				ORDER BY sls_sales, sls_quantity, sls_price;
+		-- Testing
+		SELECT DISTINCT
+			sls_sales,
+			sls_quantity,
+			sls_price
+		FROM silver.crm_sales_details
+		WHERE sls_sales != sls_quantity * sls_price
+		OR sls_sales IS NULL OR sls_quantity IS NULL OR sls_price IS NULL
+		OR sls_sales <= 0 OR sls_quantity <= 0 OR sls_price <= 0
+		ORDER BY sls_sales, sls_quantity, sls_price;
+
+
 --**********--
 SELECT *
 FROM bronze.crm_sales_details;
@@ -302,6 +317,7 @@ FROM bronze.crm_sales_details;
 SELECT *
 FROM silver.crm_sales_details;
 --**********--
+
 
 
 --Checking data quality for erp_cust_az12
@@ -315,16 +331,16 @@ FROM silver.crm_sales_details;
 					gen
 				FROM bronze.erp_cust_az12;
 
-				-- 
-				SELECT 
-					cid				
-				FROM silver.erp_cust_az12
-				WHERE cid NOT LIKE 'A%';
+		-- Testing 
+		SELECT 
+			cid				
+		FROM silver.erp_cust_az12
+		WHERE cid NOT LIKE 'A%';
 
-				SELECT 
-					cid				
-				FROM silver.erp_cust_az12
-				WHERE cid not in (SELECT cst_key FROM silver.crm_cust_info)
+		SELECT 
+			cid				
+		FROM silver.erp_cust_az12
+		WHERE cid not in (SELECT cst_key FROM silver.crm_cust_info);
 
 
 		--bdate
@@ -345,9 +361,11 @@ FROM silver.crm_sales_details;
 				FROM bronze.erp_cust_az12;
 
 		--testing
-				SELECT DISTINCT
-					gen
-				FROM silver.erp_cust_az12;
+		SELECT DISTINCT
+			gen
+		FROM silver.erp_cust_az12;
+
+
 --**********--
 SELECT *
 FROM bronze.erp_cust_az12;
@@ -359,7 +377,6 @@ FROM silver.erp_cust_az12;
 
 
 --Checking data quality for erp_loc_a101
-		
 		--cid
 				--Checking unwanted space
 				SELECT
@@ -367,11 +384,11 @@ FROM silver.erp_cust_az12;
 				FROM bronze.erp_loc_a101
 				WHERE cid != trim(cid);
 
-				--testing
-				SELECT
-					cid
-				FROM silver.erp_loc_a101
-				WHERE cid != trim(cid);
+		--testing
+		SELECT
+			cid
+		FROM silver.erp_loc_a101
+		WHERE cid != trim(cid);
 
 				--Checking unmachted cid with crm_cust_info.cst_key
 				SELECT
@@ -379,11 +396,12 @@ FROM silver.erp_cust_az12;
 				FROM bronze.erp_loc_a101
 				WHERE replace(cid, '-',  '') not in (SELECT cst_key FROM silver.crm_cust_info);
 				
-				--testing
-				SELECT
-					cid
-				FROM silver.erp_loc_a101
-				WHERE cid not in (SELECT cst_key FROM silver.crm_cust_info);
+		--testing
+		SELECT
+			cid
+		FROM silver.erp_loc_a101
+		WHERE cid not in (SELECT cst_key FROM silver.crm_cust_info);
+
 
 		--cntry
 				
@@ -409,10 +427,10 @@ FROM silver.erp_cust_az12;
 				FROM bronze.erp_loc_a101
 				ORDER BY cntry;
 
-				--Teting
-				SELECT DISTINCT
-					cntry
-				FROM silver.erp_loc_a101;
+		--Teting
+		SELECT DISTINCT
+			cntry
+		FROM silver.erp_loc_a101;
 
 		
 --**********--
@@ -422,6 +440,7 @@ FROM bronze.erp_loc_a101;
 SELECT *
 FROM silver.erp_loc_a101;
 --**********--
+
 
 
 --Checking data quality for erp_loc_a101
@@ -439,16 +458,16 @@ FROM silver.erp_loc_a101;
 				WHERE id not in (SELECT cat_id FROM silver.crm_prd_info);
 				--no result
 
-				--testing
-				SELECT 
-					id				
-				FROM silver.erp_px_cat_g1v2
-				WHERE id != trim(id);
+		--testing
+		SELECT 
+			id				
+		FROM silver.erp_px_cat_g1v2
+		WHERE id != trim(id);
 
-				SELECT 
-					id	
-				FROM silver.erp_px_cat_g1v2
-				WHERE id not in (SELECT cat_id FROM silver.crm_prd_info);
+		SELECT 
+			id	
+		FROM silver.erp_px_cat_g1v2
+		WHERE id not in (SELECT cat_id FROM silver.crm_prd_info);
 			
 
 		--cat
@@ -464,15 +483,15 @@ FROM silver.erp_loc_a101;
 				FROM bronze.erp_px_cat_g1v2;
 				--no abr. or null values
 
-				--testing
-			    SELECT 
-					cat				
-				FROM silver.erp_px_cat_g1v2
-				WHERE cat != trim(cat);
+		--testing
+		SELECT 
+			cat				
+		FROM silver.erp_px_cat_g1v2
+		WHERE cat != trim(cat);
 
-				SELECT DISTINCT 
-					cat
-				FROM silver.erp_px_cat_g1v2;
+		SELECT DISTINCT 
+			cat
+		FROM silver.erp_px_cat_g1v2;
 
 
 		 --subcat
@@ -488,15 +507,15 @@ FROM silver.erp_loc_a101;
 				FROM bronze.erp_px_cat_g1v2;
 				--no abr. or null values
 		
-				--testing
-				SELECT 
-					subcat				
-				FROM silver.erp_px_cat_g1v2
-				WHERE subcat != trim(subcat);
+		--testing
+		SELECT 
+			subcat				
+		FROM silver.erp_px_cat_g1v2
+		WHERE subcat != trim(subcat);
 
-				SELECT DISTINCT 
-					subcat
-				FROM silver.erp_px_cat_g1v2;
+		SELECT DISTINCT 
+			subcat
+		FROM silver.erp_px_cat_g1v2;
 		
 
 		--maintenance
@@ -511,15 +530,16 @@ FROM silver.erp_loc_a101;
 				FROM bronze.erp_px_cat_g1v2;
 				--no abr. or null values
 
-				--testing
-				SELECT 
-					maintenance				
-				FROM silver.erp_px_cat_g1v2
-				WHERE maintenance != trim(maintenance);
+		--testing
+		SELECT 
+			maintenance				
+		FROM silver.erp_px_cat_g1v2
+		WHERE maintenance != trim(maintenance);
 
-				SELECT DISTINCT 
-					maintenance
-				FROM silver.erp_px_cat_g1v2;
+		SELECT DISTINCT 
+			maintenance
+		FROM silver.erp_px_cat_g1v2;
+
 
 --**********--
 SELECT *
